@@ -1,43 +1,36 @@
-# gui_price_monitor.py
-import tkinter as tk
+import streamlit as st
+import time
 from backend.api_manager import APIManager
 
 # Configuração de pips
-PIP_SIZE = 0.0001  # 1 pip para EUR/USD
+PIP_SIZE = 0.0001
 
-class PriceMonitor:
-    def __init__(self, root, api_manager, pip_range=10):
-        self.api = api_manager
-        self.pip_range = pip_range
-        self.root = root
-        self.root.title(f"Preço Atual {self.api.symbol}")
+st.set_page_config(page_title="Monitor de Preços")
 
-        self.label_price = tk.Label(root, text="", font=("Arial", 24))
-        self.label_price.pack(padx=20, pady=20)
+st.title("Monitor de Preços - EUR/USD")
 
-        self.label_range = tk.Label(root, text="", font=("Arial", 16))
-        self.label_range.pack(padx=20, pady=10)
+# Inicializa o gerenciador de API
+if "api" not in st.session_state:
+    st.session_state.api = APIManager("EURUSD")
 
-        # Atualiza a interface a cada 1 segundo
-        self.update_price()
+# Input para ajustar o range de pips
+pip_range = st.slider("Faixa de Pips", min_value=1, max_value=50, value=10)
 
-    def update_price(self):
-        tick = self.api.get_price()
-        price = tick["close"]
+# Container para atualização dinâmica
+placeholder = st.empty()
 
-        # Calcula faixa +- pips
-        low = price - (self.pip_range * PIP_SIZE)
-        high = price + (self.pip_range * PIP_SIZE)
+# Loop de atualização
+while True:
+    tick = st.session_state.api.get_price()
+    price = tick["close"]
 
-        self.label_price.config(text=f"Preço: {price:.5f}")
-        self.label_range.config(text=f"Faixa: {low:.5f} - {high:.5f} (+-{self.pip_range} pips)")
+    # Cálculos
+    low = price - (pip_range * PIP_SIZE)
+    high = price + (pip_range * PIP_SIZE)
 
-        # Atualiza a cada 1 segundo
-        self.root.after(1000, self.update_price)
-
-
-if __name__ == "__main__":
-    api = APIManager("EURUSD")
-    root = tk.Tk()
-    monitor = PriceMonitor(root, api_manager=api, pip_range=10)  # +-10 pips
-    root.mainloop()
+    # Atualiza o conteúdo do container
+    with placeholder.container():
+        st.metric(label="Preço Atual", value=f"{price:.5f}")
+        st.write(f"**Faixa:** {low:.5f} - {high:.5f} (+-{pip_range} pips)")
+    
+    time.sleep(1)
