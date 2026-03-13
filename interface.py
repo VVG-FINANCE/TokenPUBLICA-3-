@@ -23,28 +23,10 @@ def render_radar_block(title, data):
                         <span class='{tag_class}'>{data['tipo']}</span>
                     </div>
                     <div style='margin-top:10px;'>
-                        <span class='zone-label'>ZONA DE ENTRADA ATIVA</span><br>
+                        <span class='zone-label'>ZONA DE ENTRADA</span><br>
                         <code style='color:#58a6ff;'>{data['z_inf']:.5f} — {data['z_sup']:.5f}</code>
-                    </div>
-                    <div style='display:flex; gap:10px; margin-top:10px;'>
-                        <div style='flex:1;'>
-                            <span class='zone-label' style='color:#3fb950;'>ALVOS (TP)</span><br>
-                            <b>{data['tp'][0]:.5f}</b><br><b>{data['tp'][1]:.5f}</b>
-                        </div>
-                        <div style='flex:1;'>
-                            <span class='zone-label' style='color:#f85149;'>RISCO (SL)</span><br>
-                            <b>{data['sl'][0]:.5f}</b><br><b>{data['sl'][1]:.5f}</b>
-                        </div>
-                    </div>
-                    <div style='margin-top:10px; font-size:0.75rem; color:#8b949e;'>
-                        CONFIANÇA INSTITUCIONAL: <b>{data['prob']:.1f}%</b>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
         else:
-            st.markdown(f"""
-                <div class='card-radar' style='opacity:0.3;'>
-                    <span style='font-weight:bold;'>{title}</span><br>
-                    <span class='zone-label'>AGUARDANDO ALINHAMENTO...</span>
-                </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f"<div class='card-radar' style='opacity:0.3;'><b>{title}</b><br><span class='zone-label'>AGUARDANDO...</span></div>", unsafe_allow_html=True)
